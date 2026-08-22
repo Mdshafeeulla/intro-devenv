@@ -1,3 +1,4 @@
+# Purpose: Deploy and apply the Apache configuration through GitHub Actions.
 name:	Deploy Apache Config
 on:
   push:

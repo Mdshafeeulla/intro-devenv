@@ -1,0 +1,5 @@
+# Purpose: Provides default Apache settings used by the apache role.
+apache_listen_port: 80
+apache_server_admin: mshafeulla@gmail.com
+apache_document_root: /var/www/html
+apache_server_name: web.msu.com

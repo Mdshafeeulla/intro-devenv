@@ -1,0 +1,57 @@
+# Purpose: Installs Apache, deploys its configuration, manages the service, and opens HTTP/HTTPS firewall ports.
+---
+- name: Install Apache (httpd)
+  ansible.builtin.dnf:
+    name: httpd
+    state: present
+- name: Ensure Apache service environment is defined
+  ansible.builtin.file:
+    path: /etc/systemd/system/httpd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  notify: Reload systemd
+- name: Define Apache service environment
+  ansible.builtin.copy:
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=/usr/sbin/httpd -DFOREGROUND
+      ExecReload=
+      ExecReload=/usr/sbin/httpd -k graceful
+    dest: /etc/systemd/system/httpd.service.d/ansible-options.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd
+- name: Deploy Apache main configuration
+  ansible.builtin.template:
+    src: httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+    owner: root
+    group: root
+    mode: '0644'
+    validate: 'httpd -t -f %s'
+  notify: Restart apache
+- name: Ensure Apache is enabled and running
+  ansible.builtin.systemd:
+    name: httpd
+    enabled: true
+    state: started
+    daemon_reload: true
+- name: Open firewall for HTTP/HTTPS
+  ansible.builtin.stat:
+    path: /usr/bin/firewall-cmd
+  register: firewall_cmd
+
+- name: Add HTTP/HTTPS services to firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - http
+    - https
+  when: firewall_cmd.stat.exists and ansible_facts['os_family'] == "RedHat"

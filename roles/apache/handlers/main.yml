@@ -1,0 +1,10 @@
+# Purpose: Defines service handlers triggered when Apache or systemd configuration changes.
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+- name: Restart apache
+  ansible.builtin.systemd:
+    name: httpd
+    state: restarted
+    daemon_reload: true

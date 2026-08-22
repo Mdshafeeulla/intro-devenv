@@ -1,0 +1,14 @@
+# Purpose: Jinja2 template for the Apache main configuration generated on target servers.
+IncludeOptional conf.modules.d/*.conf
+ServerRoot "/etc/httpd"
+Listen {{ apache_listen_port }}
+ServerAdmin {{ apache_server_admin }}
+ServerName {{ apache_server_name }}
+DocumentRoot "{{ apache_document_root }}"
+TypesConfig /etc/mime.types
+<Directory "{{ apache_document_root }}">
+    AllowOverride None
+    Require all granted
+</Directory>
+
+IncludeOptional conf.d/*.conf
