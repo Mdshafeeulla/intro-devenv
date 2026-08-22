@@ -1,0 +1,8 @@
+# Purpose: Entry point that applies the Apache role to the webservers inventory group.
+---
+- name: Deploy Apache configuration to production
+  hosts: webservers
+  become: true
+  serial: 1
+  roles:
+    - apache
